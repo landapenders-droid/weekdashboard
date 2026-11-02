@@ -335,7 +335,7 @@
       tile(W.mijlpaal_label || 'Dagen tot de start', has(W.dagen_tot_start) ? nl.format(W.dagen_tot_start) : null, W.mijlpaal || 'Groep 2 start 14 november'),
       tile('Plekken vrij', has(last.plekken_vrij) ? nl.format(last.plekken_vrij) : null, 'In de opleiding'),
       tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, 'Op weg naar ' + nl.format(DOEL)),
-      tile('Omzet deze maand', has(last.omzet_maand) ? eur(last.omzet_maand) : null, 'Uit Moneybird'),
+      tile('Omzet ' + ((D.jaar && D.jaar.jaar) || '2026'), D.jaar && has(D.jaar.omzet) ? eur(D.jaar.omzet) : null, D.jaar && D.jaar.peildatum ? 'Moneybird, ' + D.jaar.peildatum : 'Uit Moneybird'),
     );
     wrap.append(tiles);
 
@@ -345,23 +345,6 @@
       s.append(head('Het ene ding', 'Als dit lukt, is de week geslaagd'));
       const o = el('div', 'one'); o.append(el('p', 'big', W.hoofdzaak)); s.append(o);
       wrap.append(s);
-    }
-
-    /* jaarcijfers */
-    if (D.jaar && has(D.jaar.winst)) {
-      const J = D.jaar;
-      const s = el('section');
-      s.append(head('Jouw ' + (J.jaar || 'jaar'), 'Winst en omzet tot nu toe'));
-      const c = el('div', 'year');
-      c.append(el('p', 'lab', 'Winst'));
-      c.append(el('div', 'big', eur(J.winst)));
-      if (has(J.omzet) && J.omzet > 0) c.append(el('p', 'marge', 'Van elke € 100 omzet hou je € ' + Math.round(J.winst / J.omzet * 100) + ' over'));
-      const r = el('div', 'row3');
-      const cell = (l, v) => { const d = el('div'); d.append(el('p', 'lab', l), el('p', 'v', has(v) ? eur(v) : '·')); return d; };
-      r.append(cell('Omzet', J.omzet), cell('Kosten', has(J.kosten) || has(J.directe_kosten) ? (Number(J.kosten || 0) + Number(J.directe_kosten || 0)) : null), cell('Werkkapitaal', J.werkkapitaal));
-      c.append(r);
-      if (J.peildatum) c.append(el('p', 'peil', 'Uit Moneybird, stand van ' + J.peildatum));
-      s.append(c); wrap.append(s);
     }
 
     /* al gedaan */
