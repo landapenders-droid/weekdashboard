@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Weekdashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Lato:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f1ecea;
+    --panel: #f8f5f3;
+    --ink: #1f1d1c;
+    --muted: #6f6866;
+    --mauve: #a08c8c;
+    --mauve-dark: #7f6b6c;
+    --line: #ddd4d1;
+    --forest: #23271f;
+    --forest-2: #343a2d;
+    --cream: #f6f1ee;
+    --late: #9b3f45;
+    --soon: #b98a5a;
+    --serif: "Cormorant Garamond", Georgia, serif;
+    --sans: "Lato", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body { font-family: var(--sans); font-weight: 300; font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- slot ---------- */
+  .lock { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;
+    background: radial-gradient(ellipse at 50% 30%, var(--forest-2), var(--forest) 70%); color: var(--cream); padding: 24px 16px; }
+  .lock h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(2.2rem, 7vw, 3.4rem); margin: .2em 0 .1em; line-height: 1.1; }
+  .lock p { margin: 0 0 1.6em; letter-spacing: .35em; text-transform: uppercase; font-size: .72rem; opacity: .85; }
+  .lock form { display: grid; gap: 12px; width: min(100%, 340px); margin: 0 auto; }
+  .lock input[type=password] { font: inherit; padding: 14px 20px; border-radius: 999px; border: 1px solid rgba(246,241,238,.35);
+    background: rgba(246,241,238,.08); color: var(--cream); text-align: center; outline: none; }
+  .lock input[type=password]:focus { border-color: var(--cream); }
+  .lock label.rem { font-size: .85rem; opacity: .85; display: flex; gap: 8px; justify-content: center; align-items: center; }
+  .lock .err { color: #e8b9bd; font-size: .9rem; min-height: 1.4em; margin: 0; letter-spacing: 0; text-transform: none; }
+
+  .btn { font-family: var(--serif); font-weight: 400; letter-spacing: .3em; text-transform: uppercase; font-size: .95rem;
+    background: var(--mauve); color: #fff; border: 0; border-radius: 999px; padding: 16px 28px; cursor: pointer; }
+  .btn:hover { background: var(--mauve-dark); }
+
+  .stars { letter-spacing: .6em; font-size: .8rem; opacity: .7; }
+
+  /* ---------- kop ---------- */
+  .hero { background: radial-gradient(ellipse at 50% 0%, var(--forest-2), var(--forest) 75%); color: var(--cream); text-align: center; padding: 56px 16px 64px; position: relative; overflow: hidden; }
+  .hero .kicker { letter-spacing: .4em; text-transform: uppercase; font-size: .72rem; opacity: .85; margin: 14px 0 6px; }
+  .hero h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(2.4rem, 8vw, 4.2rem); line-height: 1.05; margin: 0; }
+  .hero .take { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: clamp(1.25rem, 3.6vw, 1.6rem); max-width: 34rem; margin: 22px auto 0; line-height: 1.35; }
+  .hero .upd { font-size: .78rem; opacity: .6; margin-top: 18px; }
+  .sparkle { position: absolute; color: var(--cream); opacity: .35; font-size: 14px; pointer-events: none; }
+
+  /* ---------- tegels ---------- */
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: -34px auto 0; position: relative; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 20px 14px; text-align: center; box-shadow: 0 6px 24px rgba(35,39,31,.06); }
+  .tile .lab { letter-spacing: .22em; text-transform: uppercase; font-size: .66rem; color: var(--muted); font-weight: 400; margin: 0; }
+  .tile .num { font-family: var(--serif); font-weight: 300; font-size: clamp(2.2rem, 6vw, 3rem); line-height: 1.1; margin: 6px 0 2px; font-variant-numeric: lining-nums tabular-nums; }
+  .tile .sub { font-size: .8rem; color: var(--muted); margin: 0; }
+  .tile .num.leeg { color: var(--line); }
+
+  /* ---------- secties ---------- */
+  section { margin: 56px 0; }
+  .sec-head { text-align: center; margin-bottom: 22px; }
+  .sec-head h2 { font-family: var(--serif); font-weight: 300; font-size: clamp(2rem, 6vw, 2.8rem); margin: 0; line-height: 1.1; }
+  .sec-head .caps { letter-spacing: .38em; text-transform: uppercase; font-size: .7rem; font-weight: 700; margin: 8px 0 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 24px; }
+
+  .one { text-align: center; max-width: 40rem; margin: 0 auto; }
+  .one .big { font-family: var(--serif); font-weight: 600; font-size: clamp(1.5rem, 4.6vw, 2.1rem); line-height: 1.2; color: #5d5857; margin: 0; }
+
+  .focus { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .focus li { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px 20px; text-align: center; }
+  .focus .n { font-family: var(--serif); font-size: 2.4rem; font-weight: 300; color: var(--mauve); line-height: 1; }
+  .focus .t { margin: 10px 0 12px; }
+  .pill { display: inline-block; font-size: .66rem; letter-spacing: .25em; text-transform: uppercase; color: var(--mauve-dark); border: 1px solid var(--mauve); border-radius: 999px; padding: 3px 12px; }
+
+  .list { display: grid; gap: 10px; }
+  .row { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px 18px; display: grid; grid-template-columns: 1.3fr 1.3fr .7fr 1.2fr; gap: 12px; align-items: center; }
+  .row .k { font-weight: 400; }
+  .row .m { color: var(--muted); font-size: .92rem; }
+  .row .d { font-family: var(--serif); font-size: 1.2rem; font-variant-numeric: lining-nums; }
+  .row.now { border-left: 4px solid var(--soon); }
+  .row.late { border-left: 4px solid var(--late); }
+  .row.done { opacity: .5; }
+  .row .badge { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; margin-left: 6px; }
+  .row.late .badge { color: var(--late); }
+  .row.now .badge { color: var(--soon); }
+  .legend { text-align: center; font-size: .82rem; color: var(--muted); margin: 12px 0 0; }
+
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .day { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px 14px; }
+  .day .dn { font-family: var(--serif); font-size: 1.35rem; font-weight: 400; line-height: 1.1; margin: 0; }
+  .day .wt { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 4px 0 10px; }
+  .day .af { font-size: .9rem; margin: 0 0 8px; }
+  .day .ru { font-size: .85rem; font-style: italic; color: var(--mauve-dark); margin: 0; }
+  .day.vandaag { border-color: var(--mauve); box-shadow: 0 0 0 2px rgba(160,140,140,.25); }
+
+  .chart-card { padding: 20px 16px 12px; }
+  .chart { width: 100%; height: auto; display: block; }
+  .chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+  .empty { text-align: center; color: var(--muted); font-style: italic; margin: 24px 0; }
+
+  .tips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .tip { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px; }
+  .tip .s { letter-spacing: .25em; text-transform: uppercase; font-size: .64rem; font-weight: 700; color: var(--mauve-dark); margin: 0 0 8px; }
+  .tip p { margin: 0; }
+
+  .q { text-align: center; max-width: 40rem; margin: 0 auto; }
+  .q ol { text-align: left; display: inline-block; margin: 0; padding-left: 1.2em; font-style: italic; }
+  .q li { margin: 6px 0; }
+
+  footer { text-align: center; padding: 30px 16px 50px; color: var(--muted); font-size: .8rem; }
+  footer .lockbtn { background: none; border: 0; color: var(--mauve-dark); text-decoration: underline; cursor: pointer; font: inherit; }
+
+  @media (max-width: 900px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .days { grid-template-columns: repeat(2, 1fr); }
+    .focus { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .row { grid-template-columns: 1fr auto; }
+    .row .m { grid-column: 1 / -1; order: 3; }
+    .row .st { grid-column: 1 / -1; order: 4; font-size: .9rem; }
+    .tips { grid-template-columns: 1fr; }
+    .days { grid-template-columns: 1fr; }
+    section { margin: 44px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+  <div>
+    <div class="stars">✦ ✧ ✦</div>
+    <h1>Jouw week</h1>
+    <p>Even je wachtwoord</p>
+    <form id="lockform" autocomplete="on">
+      <input type="text" name="username" value="landa" autocomplete="username" hidden>
+      <input type="password" id="pw" autocomplete="current-password" placeholder="Wachtwoord" aria-label="Wachtwoord" required>
+      <label class="rem"><input type="checkbox" id="rem" checked> Onthoud mij op dit apparaat</label>
+      <button class="btn" type="submit">Open</button>
+      <p class="err" id="err" role="alert"></p>
+    </form>
+  </div>
+</div>
+
+<main id="app" hidden></main>
+
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(function () {
+  const P = JSON.parse(document.getElementById('payload').textContent);
+  const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const KEYSTORE = 'lp-weekdashboard-key';
+
+  async function deriveRaw(pw) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: b64(P.salt), iterations: P.iter, hash: 'SHA-256' }, base, 256);
+    return new Uint8Array(bits);
+  }
+  async function decrypt(raw) {
+    const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+    const buf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(P.iv) }, key, b64(P.ct));
+    return JSON.parse(new TextDecoder().decode(buf));
+  }
+  const toB64 = (u8) => btoa(String.fromCharCode(...u8));
+  const store = {
+    get() { try { return localStorage.getItem(KEYSTORE); } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem(KEYSTORE, v); } catch (e) {} },
+    del() { try { localStorage.removeItem(KEYSTORE); } catch (e) {} },
+  };
+
+  async function tryStored() {
+    const s = store.get();
+    if (!s) return false;
+    try { const raw = b64(s); const data = await decrypt(raw); show(data); return true; }
+    catch (e) { store.del(); return false; }
+  }
+
+  document.getElementById('lockform').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const err = document.getElementById('err');
+    err.textContent = 'Even geduld…';
+    try {
+      const raw = await deriveRaw(document.getElementById('pw').value);
+      const data = await decrypt(raw);
+      if (document.getElementById('rem').checked) store.set(toB64(raw));
+      err.textContent = '';
+      show(data);
+    } catch (e) {
+      err.textContent = 'Dat wachtwoord klopt niet. Probeer het nog eens.';
+    }
+  });
+
+  tryStored();
+
+  /* ---------- tekenen ---------- */
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined && text !== null) n.textContent = text; return n; };
+  const nl = new Intl.NumberFormat('nl-NL');
+  const eur = (v) => '€ ' + new Intl.NumberFormat('nl-NL', { maximumFractionDigits: 0 }).format(v);
+  const dt = (s) => { const d = new Date(s + 'T12:00:00'); return isNaN(d) ? s : d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }); };
+  const has = (v) => v !== null && v !== undefined && v !== '';
+  const DOEL = 10000;
+
+  function head(title, caps) {
+    const h = el('div', 'sec-head');
+    h.append(el('h2', null, title));
+    if (caps) h.append(el('p', 'caps', caps));
+    return h;
+  }
+
+  function show(D) {
+    document.getElementById('lock').hidden = true;
+    document.getElementById('lock').style.display = 'none';
+    const app = document.getElementById('app');
+    app.hidden = false;
+    app.replaceChildren();
+    const W = (D.week && D.week[0]) || {};
+    const cij = D.cijfers || [];
+    const last = cij.length ? cij[cij.length - 1] : {};
+
+    /* kop */
+    const hero = el('header', 'hero');
+    hero.append(el('div', 'stars', '✦ ✧ ✦'));
+    hero.append(el('p', 'kicker', [W.week, W.fase].filter(Boolean).join('  ·  ')));
+    hero.append(el('h1', null, 'Jouw week'));
+    if (W.takeaway) hero.append(el('p', 'take', W.takeaway));
+    if (D.bijgewerkt) hero.append(el('p', 'upd', 'Bijgewerkt op ' + D.bijgewerkt));
+    [[8, 12], [86, 18], [14, 70], [92, 64], [50, 88]].forEach(([x, y], i) => {
+      const s = el('span', 'sparkle', i % 2 ? '✧' : '✦'); s.style.left = x + '%'; s.style.top = y + '%'; hero.append(s);
+    });
+    app.append(hero);
+
+    const wrap = el('div', 'wrap');
+    app.append(wrap);
+
+    /* tegels */
+    const tiles = el('div', 'tiles');
+    const tile = (lab, val, sub) => {
+      const t = el('div', 'tile');
+      t.append(el('p', 'lab', lab));
+      const n = el('div', 'num' + (has(val) ? '' : ' leeg'), has(val) ? val : '·');
+      t.append(n);
+      t.append(el('p', 'sub', sub));
+      return t;
+    };
+    tiles.append(
+      tile(W.mijlpaal_label || 'Dagen tot de start', has(W.dagen_tot_start) ? nl.format(W.dagen_tot_start) : null, W.mijlpaal || 'Groep 2 start 14 november'),
+      tile('Plekken vrij', has(last.plekken_vrij) ? nl.format(last.plekken_vrij) : null, 'In de opleiding'),
+      tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, 'Op weg naar ' + nl.format(DOEL)),
+      tile('Omzet deze maand', has(last.omzet_maand) ? eur(last.omzet_maand) : null, 'Uit Moneybird'),
+    );
+    wrap.append(tiles);
+
+    /* het ene ding */
+    if (W.hoofdzaak) {
+      const s = el('section');
+      s.append(head('Het ene ding', 'Als dit lukt, is de week geslaagd'));
+      const o = el('div', 'one'); o.append(el('p', 'big', W.hoofdzaak)); s.append(o);
+      wrap.append(s);
+    }
+
+    /* top 3 */
+    if ((D.focus || []).length) {
+      const s = el('section');
+      s.append(head('Jouw top 3', 'Binnen de fase waar je nu in zit'));
+      const ol = el('ol', 'focus');
+      D.focus.forEach((f, i) => {
+        const li = el('li');
+        li.append(el('div', 'n', String(f.nr || i + 1)));
+        li.append(el('p', 't', f.taak));
+        if (f.gebied) li.append(el('span', 'pill', f.gebied));
+        ol.append(li);
+      });
+      s.append(ol); wrap.append(s);
+    }
+
+    /* shoots */
+    if ((D.shoots || []).length) {
+      const s = el('section');
+      s.append(head('Shoots bewerken', 'Binnen drie weken klaar'));
+      const list = el('div', 'list');
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      D.shoots.forEach((r) => {
+        const af = /^af$/i.test(String(r.status || '').trim());
+        const laat = !af && has(r.deadline) && new Date(r.deadline + 'T23:59:00') < today;
+        const nu = !af && !laat && r.deze_week === 'ja';
+        const row = el('div', 'row' + (af ? ' done' : laat ? ' late' : nu ? ' now' : ''));
+        const k = el('div', 'k', r.klant);
+        if (laat) k.append(el('span', 'badge', 'over de deadline'));
+        else if (nu) k.append(el('span', 'badge', 'deze week'));
+        row.append(k, el('div', 'm', r.soort), el('div', 'd', has(r.deadline) ? dt(r.deadline) : ''), el('div', 'm st', r.status));
+        list.append(row);
+      });
+      s.append(list);
+      s.append(el('p', 'legend', 'Goudkleurige streep: deze week af. Rode streep: over de deadline.'));
+      wrap.append(s);
+    }
+
+    /* week */
+    if ((D.agenda || []).length) {
+      const s = el('section');
+      s.append(head('Je week', 'Waar zit de ruimte'));
+      const days = el('div', 'days');
+      const vandaagLabel = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'short' }).toLowerCase().replace('.', '');
+      D.agenda.forEach((a) => {
+        const isToday = vandaagLabel.startsWith(String(a.dag).toLowerCase().split(' ')[0]) && String(a.dag).toLowerCase().includes(String(new Date().getDate()));
+        const d = el('div', 'day' + (isToday ? ' vandaag' : ''));
+        d.append(el('p', 'dn', a.dag), el('p', 'wt', a.werktijd), el('p', 'af', a.afspraken), el('p', 'ru', a.ruimte));
+        days.append(d);
+      });
+      s.append(days); wrap.append(s);
+    }
+
+    /* volgers */
+    {
+      const s = el('section');
+      s.append(head('Op weg naar ' + nl.format(DOEL), 'Volgers per week'));
+      const card = el('div', 'card chart-card');
+      const pts = cij.filter((r) => has(r.volgers)).map((r) => ({ w: r.week, d: new Date(r.datum + 'T12:00:00'), v: Number(r.volgers) }));
+      if (!pts.length) card.append(el('p', 'empty', 'Nog geen volgerscijfers. Elke maandag komt er een stip bij.'));
+      else card.append(chart(pts));
+      s.append(card); wrap.append(s);
+    }
+
+    /* tips */
+    if ((D.tips || []).length) {
+      const s = el('section');
+      s.append(head('Ideeën voor deze week', 'Omzet, content en tijd voor jezelf'));
+      const g = el('div', 'tips');
+      D.tips.forEach((t) => { const c = el('div', 'tip'); c.append(el('p', 's', t.soort), el('p', null, t.tip)); g.append(c); });
+      s.append(g); wrap.append(s);
+    }
+
+    /* vragen */
+    {
+      const s = el('section');
+      s.append(head('Even inchecken', 'Antwoord in je maandaggesprek met Claude'));
+      const q = el('div', 'q'); const ol = el('ol');
+      (D.vragen && D.vragen.length ? D.vragen : [
+        'Wat was je omzet deze maand tot nu toe in Moneybird?',
+        'Welke shoots zijn af?',
+        'Kloppen je top 3 zo?',
+        'Hoe is je energie, en wanneer neem je tijd voor jezelf?',
+        'Welk nieuw idee kriebelt er? Dan parkeren we het.',
+      ]).forEach((x) => ol.append(el('li', null, x)));
+      q.append(ol); s.append(q); wrap.append(s);
+    }
+
+    const f = el('footer');
+    f.append(el('div', 'stars', '✦ ✧ ✦'));
+    const lb = el('button', 'lockbtn', 'Vergrendel op dit apparaat');
+    lb.addEventListener('click', () => { store.del(); location.reload(); });
+    f.append(lb);
+    app.append(f);
+    window.scrollTo(0, 0);
+  }
+
+  function chart(pts) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const W = 640, H = 260, m = { t: 20, r: 20, b: 34, l: 56 };
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('class', 'chart'); svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Volgers per week');
+    const mk = (tag, attrs, text) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (text) n.textContent = text; svg.append(n); return n; };
+    const vs = pts.map((p) => p.v);
+    let lo = Math.min(...vs), hi = Math.max(...vs, DOEL);
+    lo = Math.max(0, Math.floor(lo * 0.95 / 500) * 500); hi = Math.ceil(hi * 1.02 / 500) * 500;
+    const t0 = pts[0].d.getTime(), t1 = pts[pts.length - 1].d.getTime();
+    const x = (d) => pts.length === 1 ? (m.l + W - m.r) / 2 : m.l + (d.getTime() - t0) / (t1 - t0) * (W - m.l - m.r);
+    const y = (v) => H - m.b - (v - lo) / (hi - lo) * (H - m.t - m.b);
+    for (let i = 0; i <= 4; i++) {
+      const v = lo + (hi - lo) * i / 4, yy = y(v);
+      mk('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: '#ddd4d1', 'stroke-width': 1 });
+      mk('text', { x: m.l - 8, y: yy + 4, 'text-anchor': 'end' }, nl.format(Math.round(v)));
+    }
+    mk('line', { x1: m.l, x2: W - m.r, y1: y(DOEL), y2: y(DOEL), stroke: '#a08c8c', 'stroke-dasharray': '5 5' });
+    mk('text', { x: W - m.r, y: y(DOEL) - 6, 'text-anchor': 'end' }, 'doel ' + nl.format(DOEL));
+    if (pts.length > 1) mk('path', { d: pts.map((p, i) => (i ? 'L' : 'M') + x(p.d) + ' ' + y(p.v)).join(' '), fill: 'none', stroke: '#7f6b6c', 'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+    const step = Math.max(1, Math.ceil(pts.length / 6));
+    pts.forEach((p, i) => {
+      const c = mk('circle', { cx: x(p.d), cy: y(p.v), r: 5, fill: '#7f6b6c' });
+      const t = document.createElementNS(NS, 'title'); t.textContent = p.w + ': ' + nl.format(p.v) + ' volgers'; c.append(t);
+      if (i % step === 0 || i === pts.length - 1) mk('text', { x: x(p.d), y: H - 10, 'text-anchor': 'middle' }, p.d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }));
+    });
+    const lp = pts[pts.length - 1];
+    mk('text', { x: Math.min(x(lp.d), W - m.r - 4), y: y(lp.v) - 12, 'text-anchor': 'end', style: 'font-size:14px;fill:#1f1d1c' }, nl.format(lp.v));
+    return svg;
+  }
+})();
+</script>
+</body>
+</html>
