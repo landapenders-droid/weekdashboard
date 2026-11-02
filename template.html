@@ -426,9 +426,10 @@
     /* volgers */
     {
       const s = el('section');
-      s.append(head('Op weg naar ' + nl.format(DOEL), 'Volgers per week'));
+      s.append(head('Op weg naar ' + nl.format(DOEL), 'Volgers per dag'));
       const card = el('div', 'card chart-card');
-      const pts = cij.filter((r) => has(r.volgers)).map((r) => ({ w: r.week, d: new Date(r.datum + 'T12:00:00'), v: Number(r.volgers) }));
+      const bron = (D.volgers_dag && D.volgers_dag.length) ? D.volgers_dag.map((r) => ({ week: new Date(r.datum + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'short', day: 'numeric', month: 'short' }), datum: r.datum, volgers: r.volgers })) : cij;
+      const pts = bron.filter((r) => has(r.volgers)).map((r) => ({ w: r.week, d: new Date(r.datum + 'T12:00:00'), v: Number(r.volgers) }));
       if (!pts.length) card.append(el('p', 'empty', 'Nog geen volgerscijfers. Elke maandag komt er een stip bij.'));
       else card.append(chart(pts));
       s.append(card); wrap.append(s);
@@ -474,18 +475,28 @@
     svg.setAttribute('aria-label', 'Volgers per week');
     const mk = (tag, attrs, text) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (text) n.textContent = text; svg.append(n); return n; };
     const vs = pts.map((p) => p.v);
-    let lo = Math.min(...vs), hi = Math.max(...vs, DOEL);
-    lo = Math.max(0, Math.floor(lo * 0.95 / 500) * 500); hi = Math.ceil(hi * 1.02 / 500) * 500;
+    const dmin = Math.min(...vs), dmax = Math.max(...vs);
+    const showGoal = DOEL - dmax <= Math.max(200, (dmax - dmin) * 3);
+    let lo = Math.min(...vs), hi = showGoal ? Math.max(dmax, DOEL) : dmax;
+    const pad = Math.max(10, Math.round((hi - lo) * 0.15));
+    lo = Math.max(0, Math.floor((lo - pad) / 5) * 5); hi = Math.ceil((hi + pad) / 5) * 5;
     const t0 = pts[0].d.getTime(), t1 = pts[pts.length - 1].d.getTime();
     const x = (d) => pts.length === 1 ? (m.l + W - m.r) / 2 : m.l + (d.getTime() - t0) / (t1 - t0) * (W - m.l - m.r);
     const y = (v) => H - m.b - (v - lo) / (hi - lo) * (H - m.t - m.b);
-    for (let i = 0; i <= 4; i++) {
-      const v = lo + (hi - lo) * i / 4, yy = y(v);
+    const raw = (hi - lo) / 4, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const tstep = [1, 2, 5, 10].map((k) => k * mag).find((k) => k >= raw) || 10 * mag;
+    lo = Math.floor(lo / tstep) * tstep; hi = Math.ceil(hi / tstep) * tstep;
+    for (let v = lo; v <= hi + 1e-9; v += tstep) {
+      const yy = y(v);
       mk('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: '#ddd4d1', 'stroke-width': 1 });
       mk('text', { x: m.l - 8, y: yy + 4, 'text-anchor': 'end' }, nl.format(Math.round(v)));
     }
-    mk('line', { x1: m.l, x2: W - m.r, y1: y(DOEL), y2: y(DOEL), stroke: '#a08c8c', 'stroke-dasharray': '5 5' });
-    mk('text', { x: W - m.r, y: y(DOEL) - 6, 'text-anchor': 'end' }, 'doel ' + nl.format(DOEL));
+    if (showGoal) {
+      mk('line', { x1: m.l, x2: W - m.r, y1: y(DOEL), y2: y(DOEL), stroke: '#a08c8c', 'stroke-dasharray': '5 5' });
+      mk('text', { x: W - m.r, y: y(DOEL) - 6, 'text-anchor': 'end' }, 'doel ' + nl.format(DOEL));
+    } else {
+      mk('text', { x: W - m.r, y: m.t - 4, 'text-anchor': 'end' }, 'nog ' + nl.format(DOEL - dmax) + ' tot ' + nl.format(DOEL));
+    }
     if (pts.length > 1) mk('path', { d: pts.map((p, i) => (i ? 'L' : 'M') + x(p.d) + ' ' + y(p.v)).join(' '), fill: 'none', stroke: '#7f6b6c', 'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
     const step = Math.max(1, Math.ceil(pts.length / 6));
     pts.forEach((p, i) => {
