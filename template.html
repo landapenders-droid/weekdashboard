@@ -137,6 +137,12 @@
   .chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
   .empty { text-align: center; color: var(--muted); font-style: italic; margin: 24px 0; }
 
+  .done-card { background: linear-gradient(160deg, #f6eef2, var(--panel)); border: 1px solid var(--line); border-radius: 22px; padding: 26px 24px; text-align: center; }
+  .done-list { list-style: none; padding: 0; margin: 0 auto; display: grid; gap: 10px; max-width: 34rem; text-align: left; }
+  .done-list li { display: flex; gap: 12px; align-items: baseline; }
+  .done-list .ck { color: var(--magenta); font-size: 1rem; flex: none; }
+  .done-list .dg { font-size: .66rem; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-left: 6px; white-space: nowrap; }
+  .done-card .proud { font-family: var(--serif); font-style: italic; font-size: 1.3rem; margin: 18px 0 0; color: var(--mauve-dark); }
   .tips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
   .tip { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px; }
   .tip .s { letter-spacing: .25em; text-transform: uppercase; font-size: .64rem; font-weight: 700; color: var(--mauve-dark); margin: 0 0 8px; }
@@ -330,6 +336,24 @@
       s.append(head('Het ene ding', 'Als dit lukt, is de week geslaagd'));
       const o = el('div', 'one'); o.append(el('p', 'big', W.hoofdzaak)); s.append(o);
       wrap.append(s);
+    }
+
+    /* al gedaan */
+    if ((D.gedaan || []).length) {
+      const s = el('section');
+      s.append(head('Dit heb je al gedaan', 'Even stilstaan voor je verder rent'));
+      const c = el('div', 'done-card');
+      const ul = el('ul', 'done-list');
+      D.gedaan.forEach((g) => {
+        const li = el('li');
+        li.append(el('span', 'ck', '✓'));
+        const t = el('span', null, g.wat);
+        if (g.dag) t.append(el('span', 'dg', g.dag));
+        li.append(t); ul.append(li);
+      });
+      c.append(ul);
+      c.append(el('p', 'proud', D.gedaan_zin || 'Dat is al een hoop. Je mag ook gewoon even trots zijn.'));
+      s.append(c); wrap.append(s);
     }
 
     /* top 3 */
