@@ -17,8 +17,10 @@
     --mauve: #a08c8c;
     --mauve-dark: #7f6b6c;
     --line: #ddd4d1;
-    --forest: #23271f;
-    --forest-2: #343a2d;
+    --night: #1d0a1a;
+    --plum: #4a1440;
+    --magenta: #a3246f;
+    --glow: #e06aa8;
     --cream: #f6f1ee;
     --late: #9b3f45;
     --soon: #b98a5a;
@@ -32,7 +34,8 @@
 
   /* ---------- slot ---------- */
   .lock { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;
-    background: radial-gradient(ellipse at 50% 30%, var(--forest-2), var(--forest) 70%); color: var(--cream); padding: 24px 16px; }
+    background: radial-gradient(ellipse at 50% 35%, var(--magenta) 0%, var(--plum) 45%, var(--night) 85%); color: var(--cream); padding: 24px 16px; position: relative; overflow: hidden; }
+  .lock > div { position: relative; z-index: 1; }
   .lock h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(2.2rem, 7vw, 3.4rem); margin: .2em 0 .1em; line-height: 1.1; }
   .lock p { margin: 0 0 1.6em; letter-spacing: .35em; text-transform: uppercase; font-size: .72rem; opacity: .85; }
   .lock form { display: grid; gap: 12px; width: min(100%, 340px); margin: 0 auto; }
@@ -49,12 +52,29 @@
   .stars { letter-spacing: .6em; font-size: .8rem; opacity: .7; }
 
   /* ---------- kop ---------- */
-  .hero { background: radial-gradient(ellipse at 50% 0%, var(--forest-2), var(--forest) 75%); color: var(--cream); text-align: center; padding: 56px 16px 64px; position: relative; overflow: hidden; }
+  .hero { background: radial-gradient(ellipse 80% 120% at 50% 0%, var(--magenta) 0%, var(--plum) 48%, var(--night) 92%); color: var(--cream); text-align: center; padding: 56px 16px 64px; position: relative; overflow: hidden; }
   .hero .kicker { letter-spacing: .4em; text-transform: uppercase; font-size: .72rem; opacity: .85; margin: 14px 0 6px; }
   .hero h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(2.4rem, 8vw, 4.2rem); line-height: 1.05; margin: 0; }
   .hero .take { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: clamp(1.25rem, 3.6vw, 1.6rem); max-width: 34rem; margin: 22px auto 0; line-height: 1.35; }
   .hero .upd { font-size: .78rem; opacity: .6; margin-top: 18px; }
-  .sparkle { position: absolute; color: var(--cream); opacity: .35; font-size: 14px; pointer-events: none; }
+  .sparkle { position: absolute; color: #fff3f9; pointer-events: none; opacity: .5; text-shadow: 0 0 6px rgba(255,190,225,.9), 0 0 14px rgba(224,106,168,.6); }
+  .dust { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #ffe6f3; box-shadow: 0 0 6px 1px rgba(255,200,230,.8); pointer-events: none; opacity: .55; }
+  .hero > *:not(.sparkle):not(.dust) { position: relative; z-index: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .sparkle, .dust { animation: twinkle var(--d, 4s) ease-in-out var(--delay, 0s) infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: .15; transform: scale(.7); } 50% { opacity: .85; transform: scale(1); } }
+  }
+  .checkable { cursor: pointer; }
+  .tick { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--mauve); display: inline-flex; align-items: center; justify-content: center;
+    color: transparent; font-size: 14px; flex: none; transition: background .25s, color .25s; background: transparent; padding: 0; cursor: pointer; }
+  .is-done .tick { background: var(--magenta); border-color: var(--magenta); color: #fff; }
+  .focus li.is-done .t { text-decoration: line-through; text-decoration-color: var(--mauve); color: var(--muted); }
+  .focus li.is-done { background: #f3e9ee; }
+  .focus .tick { margin: 4px auto 0; }
+  .row .k { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .row.is-done { opacity: .5; }
+  .row.is-done .k > span:first-of-type { text-decoration: line-through; }
+  .hint { text-align: center; font-size: .8rem; color: var(--muted); margin: 12px 0 0; }
 
   /* ---------- tegels ---------- */
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: -34px auto 0; position: relative; }
@@ -76,7 +96,7 @@
 
   .focus { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .focus li { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px 20px; text-align: center; }
-  .focus .n { font-family: var(--serif); font-size: 2.4rem; font-weight: 300; color: var(--mauve); line-height: 1; }
+  .focus .n { font-family: var(--serif); font-size: 2.4rem; font-weight: 300; color: var(--magenta); line-height: 1; }
   .focus .t { margin: 10px 0 12px; }
   .pill { display: inline-block; font-size: .66rem; letter-spacing: .25em; text-transform: uppercase; color: var(--mauve-dark); border: 1px solid var(--mauve); border-radius: 999px; padding: 3px 12px; }
 
@@ -86,6 +106,7 @@
   .row .m { color: var(--muted); font-size: .92rem; }
   .row .d { font-family: var(--serif); font-size: 1.2rem; font-variant-numeric: lining-nums; }
   .row.now { border-left: 4px solid var(--soon); }
+  .day.vandaag { border-color: var(--magenta); }
   .row.late { border-left: 4px solid var(--late); }
   .row.done { opacity: .5; }
   .row .badge { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; margin-left: 6px; }
@@ -193,13 +214,14 @@
       const data = await decrypt(raw);
       if (document.getElementById('rem').checked) store.set(toB64(raw));
       err.textContent = '';
-      show(data);
+      var ok = data;
     } catch (e) {
       err.textContent = 'Dat wachtwoord klopt niet. Probeer het nog eens.';
+      return;
     }
+    show(ok);
   });
 
-  tryStored();
 
   /* ---------- tekenen ---------- */
   const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined && text !== null) n.textContent = text; return n; };
@@ -208,6 +230,38 @@
   const dt = (s) => { const d = new Date(s + 'T12:00:00'); return isNaN(d) ? s : d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }); };
   const has = (v) => v !== null && v !== undefined && v !== '';
   const DOEL = 10000;
+
+  function sprinkle(host) {
+    const stars = [[7, 14, 18, '✦'], [88, 12, 13, '✧'], [16, 66, 11, '✧'], [92, 58, 20, '✦'], [70, 30, 10, '✦'], [28, 30, 9, '✧'], [80, 84, 12, '✧'], [10, 90, 14, '✦']];
+    stars.forEach(([x, y, size, ch], i) => {
+      const s = el('span', 'sparkle', ch);
+      s.style.left = x + '%'; s.style.top = y + '%'; s.style.fontSize = size + 'px';
+      s.style.setProperty('--d', (3 + (i % 4)) + 's'); s.style.setProperty('--delay', (i * 0.6) + 's');
+      host.append(s);
+    });
+    for (let i = 0; i < 26; i++) {
+      const d = el('span', 'dust');
+      d.style.left = ((i * 37 + 11) % 100) + '%'; d.style.top = ((i * 53 + 7) % 100) + '%';
+      d.style.setProperty('--d', (2.5 + (i % 5) * 0.7) + 's'); d.style.setProperty('--delay', ((i * 0.37) % 4) + 's');
+      host.append(d);
+    }
+  }
+
+  /* afvinken: bewaard in deze browser, per week */
+  let WEEKKEY = 'x';
+  const checks = {
+    load() { try { return JSON.parse(localStorage.getItem('lp-af-' + WEEKKEY) || '{}'); } catch (e) { return {}; } },
+    save(o) { try { localStorage.setItem('lp-af-' + WEEKKEY, JSON.stringify(o)); } catch (e) {} },
+  };
+  function tickable(node, id, label) {
+    const state = checks.load();
+    const b = el('button', 'tick', '✓');
+    b.type = 'button'; b.setAttribute('aria-label', label + ' afvinken');
+    const set = (on) => { node.classList.toggle('is-done', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); };
+    set(!!state[id]);
+    b.addEventListener('click', (ev) => { ev.stopPropagation(); const st = checks.load(); st[id] = !st[id]; checks.save(st); set(st[id]); });
+    return b;
+  }
 
   function head(title, caps) {
     const h = el('div', 'sec-head');
@@ -223,6 +277,7 @@
     app.hidden = false;
     app.replaceChildren();
     const W = (D.week && D.week[0]) || {};
+    WEEKKEY = W.week || D.bijgewerkt || 'week';
     const cij = D.cijfers || [];
     const last = cij.length ? cij[cij.length - 1] : {};
 
@@ -233,9 +288,7 @@
     hero.append(el('h1', null, 'Jouw week'));
     if (W.takeaway) hero.append(el('p', 'take', W.takeaway));
     if (D.bijgewerkt) hero.append(el('p', 'upd', 'Bijgewerkt op ' + D.bijgewerkt));
-    [[8, 12], [86, 18], [14, 70], [92, 64], [50, 88]].forEach(([x, y], i) => {
-      const s = el('span', 'sparkle', i % 2 ? '✧' : '✦'); s.style.left = x + '%'; s.style.top = y + '%'; hero.append(s);
-    });
+    sprinkle(hero);
     app.append(hero);
 
     const wrap = el('div', 'wrap');
@@ -277,9 +330,13 @@
         li.append(el('div', 'n', String(f.nr || i + 1)));
         li.append(el('p', 't', f.taak));
         if (f.gebied) li.append(el('span', 'pill', f.gebied));
+        li.append(el('br'));
+        li.append(tickable(li, 'focus-' + (f.nr || i + 1), f.taak));
         ol.append(li);
       });
-      s.append(ol); wrap.append(s);
+      s.append(ol);
+      s.append(el('p', 'hint', 'Vink af wat klaar is. Dat onthoudt alleen dit apparaat, dus vertel het me ook even op maandag.'));
+      wrap.append(s);
     }
 
     /* shoots */
@@ -293,7 +350,9 @@
         const laat = !af && has(r.deadline) && new Date(r.deadline + 'T23:59:00') < today;
         const nu = !af && !laat && r.deze_week === 'ja';
         const row = el('div', 'row' + (af ? ' done' : laat ? ' late' : nu ? ' now' : ''));
-        const k = el('div', 'k', r.klant);
+        const k = el('div', 'k');
+        if (!af) k.append(tickable(row, 'shoot-' + r.klant, r.klant));
+        k.append(el('span', null, r.klant));
         if (laat) k.append(el('span', 'badge', 'over de deadline'));
         else if (nu) k.append(el('span', 'badge', 'deze week'));
         row.append(k, el('div', 'm', r.soort), el('div', 'd', has(r.deadline) ? dt(r.deadline) : ''), el('div', 'm st', r.status));
@@ -394,6 +453,9 @@
     mk('text', { x: Math.min(x(lp.d), W - m.r - 4), y: y(lp.v) - 12, 'text-anchor': 'end', style: 'font-size:14px;fill:#1f1d1c' }, nl.format(lp.v));
     return svg;
   }
+
+  sprinkle(document.getElementById('lock'));
+  tryStored();
 })();
 </script>
 </body>

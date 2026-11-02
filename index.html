@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Weekdashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Lato:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f1ecea;
+    --panel: #f8f5f3;
+    --ink: #1f1d1c;
+    --muted: #6f6866;
+    --mauve: #a08c8c;
+    --mauve-dark: #7f6b6c;
+    --line: #ddd4d1;
+    --night: #1d0a1a;
+    --plum: #4a1440;
+    --magenta: #a3246f;
+    --glow: #e06aa8;
+    --cream: #f6f1ee;
+    --late: #9b3f45;
+    --soon: #b98a5a;
+    --serif: "Cormorant Garamond", Georgia, serif;
+    --sans: "Lato", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body { font-family: var(--sans); font-weight: 300; font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+  /* ---------- slot ---------- */
+  .lock { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center;
+    background: radial-gradient(ellipse at 50% 35%, var(--magenta) 0%, var(--plum) 45%, var(--night) 85%); color: var(--cream); padding: 24px 16px; position: relative; overflow: hidden; }
+  .lock > div { position: relative; z-index: 1; }
+  .lock h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(2.2rem, 7vw, 3.4rem); margin: .2em 0 .1em; line-height: 1.1; }
+  .lock p { margin: 0 0 1.6em; letter-spacing: .35em; text-transform: uppercase; font-size: .72rem; opacity: .85; }
+  .lock form { display: grid; gap: 12px; width: min(100%, 340px); margin: 0 auto; }
+  .lock input[type=password] { font: inherit; padding: 14px 20px; border-radius: 999px; border: 1px solid rgba(246,241,238,.35);
+    background: rgba(246,241,238,.08); color: var(--cream); text-align: center; outline: none; }
+  .lock input[type=password]:focus { border-color: var(--cream); }
+  .lock label.rem { font-size: .85rem; opacity: .85; display: flex; gap: 8px; justify-content: center; align-items: center; }
+  .lock .err { color: #e8b9bd; font-size: .9rem; min-height: 1.4em; margin: 0; letter-spacing: 0; text-transform: none; }
+
+  .btn { font-family: var(--serif); font-weight: 400; letter-spacing: .3em; text-transform: uppercase; font-size: .95rem;
+    background: var(--mauve); color: #fff; border: 0; border-radius: 999px; padding: 16px 28px; cursor: pointer; }
+  .btn:hover { background: var(--mauve-dark); }
+
+  .stars { letter-spacing: .6em; font-size: .8rem; opacity: .7; }
+
+  /* ---------- kop ---------- */
+  .hero { background: radial-gradient(ellipse 80% 120% at 50% 0%, var(--magenta) 0%, var(--plum) 48%, var(--night) 92%); color: var(--cream); text-align: center; padding: 56px 16px 64px; position: relative; overflow: hidden; }
+  .hero .kicker { letter-spacing: .4em; text-transform: uppercase; font-size: .72rem; opacity: .85; margin: 14px 0 6px; }
+  .hero h1 { font-family: var(--serif); font-weight: 300; font-size: clamp(2.4rem, 8vw, 4.2rem); line-height: 1.05; margin: 0; }
+  .hero .take { font-family: var(--serif); font-style: italic; font-weight: 300; font-size: clamp(1.25rem, 3.6vw, 1.6rem); max-width: 34rem; margin: 22px auto 0; line-height: 1.35; }
+  .hero .upd { font-size: .78rem; opacity: .6; margin-top: 18px; }
+  .sparkle { position: absolute; color: #fff3f9; pointer-events: none; opacity: .5; text-shadow: 0 0 6px rgba(255,190,225,.9), 0 0 14px rgba(224,106,168,.6); }
+  .dust { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #ffe6f3; box-shadow: 0 0 6px 1px rgba(255,200,230,.8); pointer-events: none; opacity: .55; }
+  .hero > *:not(.sparkle):not(.dust) { position: relative; z-index: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .sparkle, .dust { animation: twinkle var(--d, 4s) ease-in-out var(--delay, 0s) infinite; }
+    @keyframes twinkle { 0%, 100% { opacity: .15; transform: scale(.7); } 50% { opacity: .85; transform: scale(1); } }
+  }
+  .checkable { cursor: pointer; }
+  .tick { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--mauve); display: inline-flex; align-items: center; justify-content: center;
+    color: transparent; font-size: 14px; flex: none; transition: background .25s, color .25s; background: transparent; padding: 0; cursor: pointer; }
+  .is-done .tick { background: var(--magenta); border-color: var(--magenta); color: #fff; }
+  .focus li.is-done .t { text-decoration: line-through; text-decoration-color: var(--mauve); color: var(--muted); }
+  .focus li.is-done { background: #f3e9ee; }
+  .focus .tick { margin: 4px auto 0; }
+  .row .k { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .row.is-done { opacity: .5; }
+  .row.is-done .k > span:first-of-type { text-decoration: line-through; }
+  .hint { text-align: center; font-size: .8rem; color: var(--muted); margin: 12px 0 0; }
+
+  /* ---------- tegels ---------- */
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin: -34px auto 0; position: relative; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 20px 14px; text-align: center; box-shadow: 0 6px 24px rgba(35,39,31,.06); }
+  .tile .lab { letter-spacing: .22em; text-transform: uppercase; font-size: .66rem; color: var(--muted); font-weight: 400; margin: 0; }
+  .tile .num { font-family: var(--serif); font-weight: 300; font-size: clamp(2.2rem, 6vw, 3rem); line-height: 1.1; margin: 6px 0 2px; font-variant-numeric: lining-nums tabular-nums; }
+  .tile .sub { font-size: .8rem; color: var(--muted); margin: 0; }
+  .tile .num.leeg { color: var(--line); }
+
+  /* ---------- secties ---------- */
+  section { margin: 56px 0; }
+  .sec-head { text-align: center; margin-bottom: 22px; }
+  .sec-head h2 { font-family: var(--serif); font-weight: 300; font-size: clamp(2rem, 6vw, 2.8rem); margin: 0; line-height: 1.1; }
+  .sec-head .caps { letter-spacing: .38em; text-transform: uppercase; font-size: .7rem; font-weight: 700; margin: 8px 0 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 24px; }
+
+  .one { text-align: center; max-width: 40rem; margin: 0 auto; }
+  .one .big { font-family: var(--serif); font-weight: 600; font-size: clamp(1.5rem, 4.6vw, 2.1rem); line-height: 1.2; color: #5d5857; margin: 0; }
+
+  .focus { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .focus li { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px 20px; text-align: center; }
+  .focus .n { font-family: var(--serif); font-size: 2.4rem; font-weight: 300; color: var(--magenta); line-height: 1; }
+  .focus .t { margin: 10px 0 12px; }
+  .pill { display: inline-block; font-size: .66rem; letter-spacing: .25em; text-transform: uppercase; color: var(--mauve-dark); border: 1px solid var(--mauve); border-radius: 999px; padding: 3px 12px; }
+
+  .list { display: grid; gap: 10px; }
+  .row { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 14px 18px; display: grid; grid-template-columns: 1.3fr 1.3fr .7fr 1.2fr; gap: 12px; align-items: center; }
+  .row .k { font-weight: 400; }
+  .row .m { color: var(--muted); font-size: .92rem; }
+  .row .d { font-family: var(--serif); font-size: 1.2rem; font-variant-numeric: lining-nums; }
+  .row.now { border-left: 4px solid var(--soon); }
+  .day.vandaag { border-color: var(--magenta); }
+  .row.late { border-left: 4px solid var(--late); }
+  .row.done { opacity: .5; }
+  .row .badge { font-size: .62rem; letter-spacing: .2em; text-transform: uppercase; margin-left: 6px; }
+  .row.late .badge { color: var(--late); }
+  .row.now .badge { color: var(--soon); }
+  .legend { text-align: center; font-size: .82rem; color: var(--muted); margin: 12px 0 0; }
+
+  .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .day { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px 14px; }
+  .day .dn { font-family: var(--serif); font-size: 1.35rem; font-weight: 400; line-height: 1.1; margin: 0; }
+  .day .wt { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 4px 0 10px; }
+  .day .af { font-size: .9rem; margin: 0 0 8px; }
+  .day .ru { font-size: .85rem; font-style: italic; color: var(--mauve-dark); margin: 0; }
+  .day.vandaag { border-color: var(--mauve); box-shadow: 0 0 0 2px rgba(160,140,140,.25); }
+
+  .chart-card { padding: 20px 16px 12px; }
+  .chart { width: 100%; height: auto; display: block; }
+  .chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+  .empty { text-align: center; color: var(--muted); font-style: italic; margin: 24px 0; }
+
+  .tips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .tip { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 22px; }
+  .tip .s { letter-spacing: .25em; text-transform: uppercase; font-size: .64rem; font-weight: 700; color: var(--mauve-dark); margin: 0 0 8px; }
+  .tip p { margin: 0; }
+
+  .q { text-align: center; max-width: 40rem; margin: 0 auto; }
+  .q ol { text-align: left; display: inline-block; margin: 0; padding-left: 1.2em; font-style: italic; }
+  .q li { margin: 6px 0; }
+
+  footer { text-align: center; padding: 30px 16px 50px; color: var(--muted); font-size: .8rem; }
+  footer .lockbtn { background: none; border: 0; color: var(--mauve-dark); text-decoration: underline; cursor: pointer; font: inherit; }
+
+  @media (max-width: 900px) {
+    .tiles { grid-template-columns: repeat(2, 1fr); }
+    .days { grid-template-columns: repeat(2, 1fr); }
+    .focus { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 16px; }
+    .row { grid-template-columns: 1fr auto; }
+    .row .m { grid-column: 1 / -1; order: 3; }
+    .row .st { grid-column: 1 / -1; order: 4; font-size: .9rem; }
+    .tips { grid-template-columns: 1fr; }
+    .days { grid-template-columns: 1fr; }
+    section { margin: 44px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="lock" id="lock">
+  <div>
+    <div class="stars">✦ ✧ ✦</div>
+    <h1>Jouw week</h1>
+    <p>Even je wachtwoord</p>
+    <form id="lockform" autocomplete="on">
+      <input type="text" name="username" value="landa" autocomplete="username" hidden>
+      <input type="password" id="pw" autocomplete="current-password" placeholder="Wachtwoord" aria-label="Wachtwoord" required>
+      <label class="rem"><input type="checkbox" id="rem" checked> Onthoud mij op dit apparaat</label>
+      <button class="btn" type="submit">Open</button>
+      <p class="err" id="err" role="alert"></p>
+    </form>
+  </div>
+</div>
+
+<main id="app" hidden></main>
+
+<script id="payload" type="application/json">{"salt": "WexdgugC5QjJG6AXdb0KGg==", "iv": "5xI2+rott4i35Rje", "iter": 310000, "ct": "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"}</script>
+<script>
+(function () {
+  const P = JSON.parse(document.getElementById('payload').textContent);
+  const b64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const KEYSTORE = 'lp-weekdashboard-key';
+
+  async function deriveRaw(pw) {
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: b64(P.salt), iterations: P.iter, hash: 'SHA-256' }, base, 256);
+    return new Uint8Array(bits);
+  }
+  async function decrypt(raw) {
+    const key = await crypto.subtle.importKey('raw', raw, 'AES-GCM', false, ['decrypt']);
+    const buf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(P.iv) }, key, b64(P.ct));
+    return JSON.parse(new TextDecoder().decode(buf));
+  }
+  const toB64 = (u8) => btoa(String.fromCharCode(...u8));
+  const store = {
+    get() { try { return localStorage.getItem(KEYSTORE); } catch (e) { return null; } },
+    set(v) { try { localStorage.setItem(KEYSTORE, v); } catch (e) {} },
+    del() { try { localStorage.removeItem(KEYSTORE); } catch (e) {} },
+  };
+
+  async function tryStored() {
+    const s = store.get();
+    if (!s) return false;
+    try { const raw = b64(s); const data = await decrypt(raw); show(data); return true; }
+    catch (e) { store.del(); return false; }
+  }
+
+  document.getElementById('lockform').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const err = document.getElementById('err');
+    err.textContent = 'Even geduld…';
+    try {
+      const raw = await deriveRaw(document.getElementById('pw').value);
+      const data = await decrypt(raw);
+      if (document.getElementById('rem').checked) store.set(toB64(raw));
+      err.textContent = '';
+      var ok = data;
+    } catch (e) {
+      err.textContent = 'Dat wachtwoord klopt niet. Probeer het nog eens.';
+      return;
+    }
+    show(ok);
+  });
+
+
+  /* ---------- tekenen ---------- */
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined && text !== null) n.textContent = text; return n; };
+  const nl = new Intl.NumberFormat('nl-NL');
+  const eur = (v) => '€ ' + new Intl.NumberFormat('nl-NL', { maximumFractionDigits: 0 }).format(v);
+  const dt = (s) => { const d = new Date(s + 'T12:00:00'); return isNaN(d) ? s : d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }); };
+  const has = (v) => v !== null && v !== undefined && v !== '';
+  const DOEL = 10000;
+
+  function sprinkle(host) {
+    const stars = [[7, 14, 18, '✦'], [88, 12, 13, '✧'], [16, 66, 11, '✧'], [92, 58, 20, '✦'], [70, 30, 10, '✦'], [28, 30, 9, '✧'], [80, 84, 12, '✧'], [10, 90, 14, '✦']];
+    stars.forEach(([x, y, size, ch], i) => {
+      const s = el('span', 'sparkle', ch);
+      s.style.left = x + '%'; s.style.top = y + '%'; s.style.fontSize = size + 'px';
+      s.style.setProperty('--d', (3 + (i % 4)) + 's'); s.style.setProperty('--delay', (i * 0.6) + 's');
+      host.append(s);
+    });
+    for (let i = 0; i < 26; i++) {
+      const d = el('span', 'dust');
+      d.style.left = ((i * 37 + 11) % 100) + '%'; d.style.top = ((i * 53 + 7) % 100) + '%';
+      d.style.setProperty('--d', (2.5 + (i % 5) * 0.7) + 's'); d.style.setProperty('--delay', ((i * 0.37) % 4) + 's');
+      host.append(d);
+    }
+  }
+
+  /* afvinken: bewaard in deze browser, per week */
+  let WEEKKEY = 'x';
+  const checks = {
+    load() { try { return JSON.parse(localStorage.getItem('lp-af-' + WEEKKEY) || '{}'); } catch (e) { return {}; } },
+    save(o) { try { localStorage.setItem('lp-af-' + WEEKKEY, JSON.stringify(o)); } catch (e) {} },
+  };
+  function tickable(node, id, label) {
+    const state = checks.load();
+    const b = el('button', 'tick', '✓');
+    b.type = 'button'; b.setAttribute('aria-label', label + ' afvinken');
+    const set = (on) => { node.classList.toggle('is-done', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); };
+    set(!!state[id]);
+    b.addEventListener('click', (ev) => { ev.stopPropagation(); const st = checks.load(); st[id] = !st[id]; checks.save(st); set(st[id]); });
+    return b;
+  }
+
+  function head(title, caps) {
+    const h = el('div', 'sec-head');
+    h.append(el('h2', null, title));
+    if (caps) h.append(el('p', 'caps', caps));
+    return h;
+  }
+
+  function show(D) {
+    document.getElementById('lock').hidden = true;
+    document.getElementById('lock').style.display = 'none';
+    const app = document.getElementById('app');
+    app.hidden = false;
+    app.replaceChildren();
+    const W = (D.week && D.week[0]) || {};
+    WEEKKEY = W.week || D.bijgewerkt || 'week';
+    const cij = D.cijfers || [];
+    const last = cij.length ? cij[cij.length - 1] : {};
+
+    /* kop */
+    const hero = el('header', 'hero');
+    hero.append(el('div', 'stars', '✦ ✧ ✦'));
+    hero.append(el('p', 'kicker', [W.week, W.fase].filter(Boolean).join('  ·  ')));
+    hero.append(el('h1', null, 'Jouw week'));
+    if (W.takeaway) hero.append(el('p', 'take', W.takeaway));
+    if (D.bijgewerkt) hero.append(el('p', 'upd', 'Bijgewerkt op ' + D.bijgewerkt));
+    sprinkle(hero);
+    app.append(hero);
+
+    const wrap = el('div', 'wrap');
+    app.append(wrap);
+
+    /* tegels */
+    const tiles = el('div', 'tiles');
+    const tile = (lab, val, sub) => {
+      const t = el('div', 'tile');
+      t.append(el('p', 'lab', lab));
+      const n = el('div', 'num' + (has(val) ? '' : ' leeg'), has(val) ? val : '·');
+      t.append(n);
+      t.append(el('p', 'sub', sub));
+      return t;
+    };
+    tiles.append(
+      tile(W.mijlpaal_label || 'Dagen tot de start', has(W.dagen_tot_start) ? nl.format(W.dagen_tot_start) : null, W.mijlpaal || 'Groep 2 start 14 november'),
+      tile('Plekken vrij', has(last.plekken_vrij) ? nl.format(last.plekken_vrij) : null, 'In de opleiding'),
+      tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, 'Op weg naar ' + nl.format(DOEL)),
+      tile('Omzet deze maand', has(last.omzet_maand) ? eur(last.omzet_maand) : null, 'Uit Moneybird'),
+    );
+    wrap.append(tiles);
+
+    /* het ene ding */
+    if (W.hoofdzaak) {
+      const s = el('section');
+      s.append(head('Het ene ding', 'Als dit lukt, is de week geslaagd'));
+      const o = el('div', 'one'); o.append(el('p', 'big', W.hoofdzaak)); s.append(o);
+      wrap.append(s);
+    }
+
+    /* top 3 */
+    if ((D.focus || []).length) {
+      const s = el('section');
+      s.append(head('Jouw top 3', 'Binnen de fase waar je nu in zit'));
+      const ol = el('ol', 'focus');
+      D.focus.forEach((f, i) => {
+        const li = el('li');
+        li.append(el('div', 'n', String(f.nr || i + 1)));
+        li.append(el('p', 't', f.taak));
+        if (f.gebied) li.append(el('span', 'pill', f.gebied));
+        li.append(el('br'));
+        li.append(tickable(li, 'focus-' + (f.nr || i + 1), f.taak));
+        ol.append(li);
+      });
+      s.append(ol);
+      s.append(el('p', 'hint', 'Vink af wat klaar is. Dat onthoudt alleen dit apparaat, dus vertel het me ook even op maandag.'));
+      wrap.append(s);
+    }
+
+    /* shoots */
+    if ((D.shoots || []).length) {
+      const s = el('section');
+      s.append(head('Shoots bewerken', 'Binnen drie weken klaar'));
+      const list = el('div', 'list');
+      const today = new Date(); today.setHours(0, 0, 0, 0);
+      D.shoots.forEach((r) => {
+        const af = /^af$/i.test(String(r.status || '').trim());
+        const laat = !af && has(r.deadline) && new Date(r.deadline + 'T23:59:00') < today;
+        const nu = !af && !laat && r.deze_week === 'ja';
+        const row = el('div', 'row' + (af ? ' done' : laat ? ' late' : nu ? ' now' : ''));
+        const k = el('div', 'k');
+        if (!af) k.append(tickable(row, 'shoot-' + r.klant, r.klant));
+        k.append(el('span', null, r.klant));
+        if (laat) k.append(el('span', 'badge', 'over de deadline'));
+        else if (nu) k.append(el('span', 'badge', 'deze week'));
+        row.append(k, el('div', 'm', r.soort), el('div', 'd', has(r.deadline) ? dt(r.deadline) : ''), el('div', 'm st', r.status));
+        list.append(row);
+      });
+      s.append(list);
+      s.append(el('p', 'legend', 'Goudkleurige streep: deze week af. Rode streep: over de deadline.'));
+      wrap.append(s);
+    }
+
+    /* week */
+    if ((D.agenda || []).length) {
+      const s = el('section');
+      s.append(head('Je week', 'Waar zit de ruimte'));
+      const days = el('div', 'days');
+      const vandaagLabel = new Date().toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'short' }).toLowerCase().replace('.', '');
+      D.agenda.forEach((a) => {
+        const isToday = vandaagLabel.startsWith(String(a.dag).toLowerCase().split(' ')[0]) && String(a.dag).toLowerCase().includes(String(new Date().getDate()));
+        const d = el('div', 'day' + (isToday ? ' vandaag' : ''));
+        d.append(el('p', 'dn', a.dag), el('p', 'wt', a.werktijd), el('p', 'af', a.afspraken), el('p', 'ru', a.ruimte));
+        days.append(d);
+      });
+      s.append(days); wrap.append(s);
+    }
+
+    /* volgers */
+    {
+      const s = el('section');
+      s.append(head('Op weg naar ' + nl.format(DOEL), 'Volgers per week'));
+      const card = el('div', 'card chart-card');
+      const pts = cij.filter((r) => has(r.volgers)).map((r) => ({ w: r.week, d: new Date(r.datum + 'T12:00:00'), v: Number(r.volgers) }));
+      if (!pts.length) card.append(el('p', 'empty', 'Nog geen volgerscijfers. Elke maandag komt er een stip bij.'));
+      else card.append(chart(pts));
+      s.append(card); wrap.append(s);
+    }
+
+    /* tips */
+    if ((D.tips || []).length) {
+      const s = el('section');
+      s.append(head('Ideeën voor deze week', 'Omzet, content en tijd voor jezelf'));
+      const g = el('div', 'tips');
+      D.tips.forEach((t) => { const c = el('div', 'tip'); c.append(el('p', 's', t.soort), el('p', null, t.tip)); g.append(c); });
+      s.append(g); wrap.append(s);
+    }
+
+    /* vragen */
+    {
+      const s = el('section');
+      s.append(head('Even inchecken', 'Antwoord in je maandaggesprek met Claude'));
+      const q = el('div', 'q'); const ol = el('ol');
+      (D.vragen && D.vragen.length ? D.vragen : [
+        'Wat was je omzet deze maand tot nu toe in Moneybird?',
+        'Welke shoots zijn af?',
+        'Kloppen je top 3 zo?',
+        'Hoe is je energie, en wanneer neem je tijd voor jezelf?',
+        'Welk nieuw idee kriebelt er? Dan parkeren we het.',
+      ]).forEach((x) => ol.append(el('li', null, x)));
+      q.append(ol); s.append(q); wrap.append(s);
+    }
+
+    const f = el('footer');
+    f.append(el('div', 'stars', '✦ ✧ ✦'));
+    const lb = el('button', 'lockbtn', 'Vergrendel op dit apparaat');
+    lb.addEventListener('click', () => { store.del(); location.reload(); });
+    f.append(lb);
+    app.append(f);
+    window.scrollTo(0, 0);
+  }
+
+  function chart(pts) {
+    const NS = 'http://www.w3.org/2000/svg';
+    const W = 640, H = 260, m = { t: 20, r: 20, b: 34, l: 56 };
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('class', 'chart'); svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', 'Volgers per week');
+    const mk = (tag, attrs, text) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (text) n.textContent = text; svg.append(n); return n; };
+    const vs = pts.map((p) => p.v);
+    let lo = Math.min(...vs), hi = Math.max(...vs, DOEL);
+    lo = Math.max(0, Math.floor(lo * 0.95 / 500) * 500); hi = Math.ceil(hi * 1.02 / 500) * 500;
+    const t0 = pts[0].d.getTime(), t1 = pts[pts.length - 1].d.getTime();
+    const x = (d) => pts.length === 1 ? (m.l + W - m.r) / 2 : m.l + (d.getTime() - t0) / (t1 - t0) * (W - m.l - m.r);
+    const y = (v) => H - m.b - (v - lo) / (hi - lo) * (H - m.t - m.b);
+    for (let i = 0; i <= 4; i++) {
+      const v = lo + (hi - lo) * i / 4, yy = y(v);
+      mk('line', { x1: m.l, x2: W - m.r, y1: yy, y2: yy, stroke: '#ddd4d1', 'stroke-width': 1 });
+      mk('text', { x: m.l - 8, y: yy + 4, 'text-anchor': 'end' }, nl.format(Math.round(v)));
+    }
+    mk('line', { x1: m.l, x2: W - m.r, y1: y(DOEL), y2: y(DOEL), stroke: '#a08c8c', 'stroke-dasharray': '5 5' });
+    mk('text', { x: W - m.r, y: y(DOEL) - 6, 'text-anchor': 'end' }, 'doel ' + nl.format(DOEL));
+    if (pts.length > 1) mk('path', { d: pts.map((p, i) => (i ? 'L' : 'M') + x(p.d) + ' ' + y(p.v)).join(' '), fill: 'none', stroke: '#7f6b6c', 'stroke-width': 2.5, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
+    const step = Math.max(1, Math.ceil(pts.length / 6));
+    pts.forEach((p, i) => {
+      const c = mk('circle', { cx: x(p.d), cy: y(p.v), r: 5, fill: '#7f6b6c' });
+      const t = document.createElementNS(NS, 'title'); t.textContent = p.w + ': ' + nl.format(p.v) + ' volgers'; c.append(t);
+      if (i % step === 0 || i === pts.length - 1) mk('text', { x: x(p.d), y: H - 10, 'text-anchor': 'middle' }, p.d.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' }));
+    });
+    const lp = pts[pts.length - 1];
+    mk('text', { x: Math.min(x(lp.d), W - m.r - 4), y: y(lp.v) - 12, 'text-anchor': 'end', style: 'font-size:14px;fill:#1f1d1c' }, nl.format(lp.v));
+    return svg;
+  }
+
+  sprinkle(document.getElementById('lock'));
+  tryStored();
+})();
+</script>
+</body>
+</html>
