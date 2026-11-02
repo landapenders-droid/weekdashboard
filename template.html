@@ -297,6 +297,20 @@
     return h;
   }
 
+  /* tekst die bij het moment van de dag past: string of {ochtend, middag, avond} */
+  function dagdeel() { const h = new Date().getHours(); return h < 12 ? 'ochtend' : h < 18 ? 'middag' : 'avond'; }
+  function nuTekst(v) {
+    if (!v) return '';
+    if (typeof v === 'string') return v;
+    const d = dagdeel();
+    return v[d] || (d === 'avond' ? v.middag : null) || v.ochtend || '';
+  }
+  function isVandaag(D) {
+    if (!D.datum) return true;
+    const n = new Date(); const iso = n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0') + '-' + String(n.getDate()).padStart(2, '0');
+    return D.datum === iso;
+  }
+
   function show(D) {
     document.getElementById('lock').hidden = true;
     document.getElementById('lock').style.display = 'none';
@@ -313,7 +327,7 @@
     hero.append(el('p', 'kicker', [W.week, W.fase].filter(Boolean).join('  ·  ')));
     hero.append(el('h1', null, 'Jouw week'));
     if (W.takeaway) hero.append(el('p', 'take', W.takeaway));
-    if (D.vandaag) hero.append(el('p', 'today', D.vandaag));
+    if (D.vandaag && isVandaag(D)) { const t = nuTekst(D.vandaag); if (t) hero.append(el('p', 'today', t)); }
     if (D.bijgewerkt) hero.append(el('p', 'upd', 'Bijgewerkt op ' + D.bijgewerkt));
     sprinkle(hero);
     app.append(hero);
@@ -361,7 +375,7 @@
         li.append(t); ul.append(li);
       });
       c.append(ul);
-      c.append(el('p', 'proud', D.gedaan_zin || 'Dat is al een hoop. Je mag ook gewoon even trots zijn.'));
+      c.append(el('p', 'proud', (isVandaag(D) && nuTekst(D.gedaan_zin)) || 'Dat is al een hoop. Je mag ook gewoon even trots zijn.'));
       s.append(c); wrap.append(s);
     }
 
