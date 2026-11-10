@@ -135,6 +135,7 @@
   .chart-card { padding: 20px 16px 12px; }
   .chart { width: 100%; height: auto; display: block; }
   .chart text { font-family: var(--sans); font-size: 12px; fill: var(--muted); }
+  .maand { text-align: center; color: var(--muted); font-size: .95rem; margin: 10px 0 4px; }
   .empty { text-align: center; color: var(--muted); font-style: italic; margin: 24px 0; }
 
   .year { background: radial-gradient(ellipse 90% 140% at 50% 0%, #f6e8ef, var(--panel) 70%); border: 1px solid var(--line); border-radius: 22px; padding: 28px 20px; text-align: center; }
@@ -446,6 +447,11 @@
       const pts = bron.filter((r) => has(r.volgers)).map((r) => ({ w: r.week, d: new Date(r.datum + 'T12:00:00'), v: Number(r.volgers) }));
       if (!pts.length) card.append(el('p', 'empty', 'Nog geen volgerscijfers. Elke maandag komt er een stip bij.'));
       else card.append(chart(pts));
+      const m = D.volgers_30d;
+      if (m && has(m.erbij) && has(m.eraf)) {
+        const netto = m.erbij - m.eraf;
+        card.append(el('p', 'maand', 'Laatste 30 dagen: ' + nl.format(m.erbij) + ' erbij en ' + nl.format(m.eraf) + ' eraf, dus netto ' + (netto >= 0 ? '+' : '') + nl.format(netto) + '.'));
+      }
       s.append(card); wrap.append(s);
     }
 
