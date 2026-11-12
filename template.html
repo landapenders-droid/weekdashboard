@@ -349,7 +349,7 @@
     tiles.append(
       tile(W.mijlpaal_label || 'Dagen tot de start', has(W.dagen_tot_start) ? nl.format(W.dagen_tot_start) : null, W.mijlpaal || 'Groep 2 start 14 november'),
       tile('Plekken vrij', has(last.plekken_vrij) ? nl.format(last.plekken_vrij) : null, 'In de opleiding'),
-      tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, 'Op weg naar ' + nl.format(DOEL)),
+      tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, (D.volgers_30d && has(D.volgers_30d.erbij) && has(D.volgers_30d.eraf)) ? '+' + nl.format(D.volgers_30d.erbij) + ' erbij, ' + nl.format(D.volgers_30d.eraf) + ' eraf in 30 dagen' : 'Op weg naar ' + nl.format(DOEL)),
       tile('Omzet ' + ((D.jaar && D.jaar.jaar) || '2026'), D.jaar && has(D.jaar.omzet) ? eur(D.jaar.omzet) : null, D.jaar && D.jaar.peildatum ? 'Moneybird, ' + D.jaar.peildatum : 'Uit Moneybird'),
     );
     wrap.append(tiles);
