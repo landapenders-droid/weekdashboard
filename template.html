@@ -349,8 +349,8 @@
     tiles.append(
       tile(W.mijlpaal_label || 'Dagen tot de start', has(W.dagen_tot_start) ? nl.format(W.dagen_tot_start) : null, W.mijlpaal || 'Groep 2 start 14 november'),
       tile('Plekken vrij', has(last.plekken_vrij) ? nl.format(last.plekken_vrij) : null, 'In de opleiding'),
-      tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, (D.volgers_30d && has(D.volgers_30d.erbij) && has(D.volgers_30d.eraf)) ? '+' + nl.format(D.volgers_30d.erbij) + ' erbij, ' + nl.format(D.volgers_30d.eraf) + ' eraf in 30 dagen' : 'Op weg naar ' + nl.format(DOEL)),
-      tile('Omzet ' + ((D.jaar && D.jaar.jaar) || '2026'), D.jaar && has(D.jaar.omzet) ? eur(D.jaar.omzet) : null, D.jaar && D.jaar.peildatum ? 'Moneybird, ' + D.jaar.peildatum : 'Uit Moneybird'),
+      tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, (D.volgers_30d && has(D.volgers_30d.erbij) && has(D.volgers_30d.eraf)) ? (function(n){return (n >= 0 ? '+' : '') + nl.format(n) + ' in de laatste 30 dagen';})(D.volgers_30d.erbij - D.volgers_30d.eraf) : 'Op weg naar ' + nl.format(DOEL)),
+      tile('Omzet ' + ((D.jaar && D.jaar.jaar) || '2026'), D.jaar && has(D.jaar.omzet) ? eur(D.jaar.omzet) : null, D.jaar && D.jaar.peildatum ? ((has(D.jaar.vorige_omzet) && D.jaar.omzet - D.jaar.vorige_omzet > 0) ? '+' + eur(D.jaar.omzet - D.jaar.vorige_omzet) + ' sinds ' + (D.jaar.vorige_peildatum || 'vorige keer') + ' · Moneybird, ' + D.jaar.peildatum : 'Moneybird, ' + D.jaar.peildatum) : 'Uit Moneybird'),
     );
     wrap.append(tiles);
 
@@ -450,7 +450,7 @@
       const m = D.volgers_30d;
       if (m && has(m.erbij) && has(m.eraf)) {
         const netto = m.erbij - m.eraf;
-        card.append(el('p', 'maand', 'Laatste 30 dagen: ' + nl.format(m.erbij) + ' erbij en ' + nl.format(m.eraf) + ' eraf, dus netto ' + (netto >= 0 ? '+' : '') + nl.format(netto) + '.'));
+        card.append(el('p', 'maand', 'Laatste 30 dagen netto ' + (netto >= 0 ? '+' : '') + nl.format(netto) + ' volgers.'));
       }
       s.append(card); wrap.append(s);
     }
