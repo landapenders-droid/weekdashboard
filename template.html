@@ -348,7 +348,7 @@
     };
     tiles.append(
       tile(W.mijlpaal_label || 'Dagen tot de start', has(W.dagen_tot_start) ? nl.format(W.dagen_tot_start) : null, W.mijlpaal || 'Groep 2 start 14 november'),
-      tile('Plekken vrij', has(last.plekken_vrij) ? nl.format(last.plekken_vrij) : null, 'In de opleiding'),
+      (D.fase_tegel ? tile(D.fase_tegel.label || 'Deze fase', has(D.fase_tegel.waarde) ? (typeof D.fase_tegel.waarde === 'number' ? nl.format(D.fase_tegel.waarde) : D.fase_tegel.waarde) : null, D.fase_tegel.sub || '') : tile('Plekken vrij', has(last.plekken_vrij) ? nl.format(last.plekken_vrij) : null, 'In de opleiding')),
       tile('Volgers', has(last.volgers) ? nl.format(last.volgers) : null, (D.volgers_30d && has(D.volgers_30d.erbij) && has(D.volgers_30d.eraf)) ? (function(n){return (n >= 0 ? '+' : '') + nl.format(n) + ' in de laatste 30 dagen';})(D.volgers_30d.erbij - D.volgers_30d.eraf) : 'Op weg naar ' + nl.format(DOEL)),
       tile('Omzet ' + ((D.jaar && D.jaar.jaar) || '2026'), D.jaar && has(D.jaar.omzet) ? eur(D.jaar.omzet) : null, D.jaar && D.jaar.peildatum ? ((has(D.jaar.vorige_omzet) && D.jaar.omzet - D.jaar.vorige_omzet > 0) ? '+' + eur(D.jaar.omzet - D.jaar.vorige_omzet) + ' sinds ' + (D.jaar.vorige_peildatum || 'vorige keer') + ' · Moneybird, ' + D.jaar.peildatum : 'Moneybird, ' + D.jaar.peildatum) : 'Uit Moneybird'),
     );
